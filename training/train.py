@@ -1,6 +1,27 @@
 import time
 import keras.backend as K
 import numpy as np
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
+import threading
+
+###########################
+# Async queues
+###########################
+if settings.in_memory:
+    queue = tu.BatchGenerator(X_train, dy_normed_train, settings.batch_size)
+else:
+    queue = Queue(maxsize=settings.queue_max_size)
+    stop_event = threading.Event()
+    writer_p = threading.Thread(target=tu.producer, args=(queue,
+                                                          settings,
+                                                          iteration,
+                                                          stop_event,
+                                                          producer_type))
+    writer_p.start()
+    lu.print_queues()
 
 
 def cyclic_rate():
